@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import GroupedStackedChangelogCard from 'dashboard/components-next/changelog-card/GroupedStackedChangelogCard.vue';
 import { useUISettings } from 'dashboard/composables/useUISettings';
+import { useMapGetter } from 'dashboard/composables/store';
 import changelogAPI from 'dashboard/api/changelog';
 
 defineOptions({
@@ -11,6 +12,7 @@ defineOptions({
 const MAX_DISMISSED_SLUGS = 5;
 
 const { uiSettings, updateUISettings } = useUISettings();
+const globalConfig = useMapGetter('globalConfig/get');
 const posts = ref([]);
 const currentIndex = ref(0);
 const dismissingCards = ref([]);
@@ -28,6 +30,8 @@ const unDismissedPosts = computed(() => {
 
 // Fetch changelog posts from API
 const fetchChangelog = async () => {
+  if (globalConfig.value.disableChatwootHub) return;
+
   isLoading.value = true;
 
   try {

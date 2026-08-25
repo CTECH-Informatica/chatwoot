@@ -32,6 +32,39 @@ Por política organizacional, os agentes **não podem** usar Enter para enviar m
 - `app/javascript/dashboard/routes/dashboard/settings/profile/Index.vue`
 - `app/javascript/dashboard/i18n/locale/en/settings.json`
 
+### 2. Desativação do Chatwoot Hub (cloud)
+
+Por padrão, a instalação CTECH **não consulta** serviços externos do Chatwoot (`hub.2.chatwoot.com`). Isso evita problemas de sincronização de plano, telemetria, reset de features premium e dependência de rede.
+
+**Comportamento quando `DISABLE_CHATWOOT_HUB=true` (padrão CTECH):**
+
+| Consulta bloqueada | Impacto |
+|--------------------|---------|
+| `sync_with_hub` (job diário) | Não sincroniza plano/licença com a cloud |
+| `register_instance` (onboarding) | Não registra a instalação no Hub |
+| `emit_event` (telemetria) | Não envia eventos de uso |
+| `send_push` via Hub | Push FCM via relay do Hub desativado — configure `FIREBASE_PROJECT_ID` + `FIREBASE_CREDENTIALS` para push mobile |
+| Changelog no sidebar | Não busca novidades do Hub |
+| `ReconcilePlanConfigService` | Não desativa features premium automaticamente |
+
+**Configuração:** `DISABLE_CHATWOOT_HUB` em `config/installation_config.yml` (padrão: `true`, bloqueada).
+
+Também pode ser controlado via variável de ambiente `DISABLE_CHATWOOT_HUB=true`.
+
+**Plano padrão:** `INSTALLATION_PRICING_PLAN` definido como `enterprise` (sem depender do Hub).
+
+**Arquivos alterados:**
+- `lib/chatwoot_hub.rb`
+- `config/installation_config.yml`
+- `app/jobs/internal/check_new_versions_job.rb`
+- `app/jobs/internal/trigger_daily_scheduled_items_job.rb`
+- `enterprise/app/jobs/enterprise/internal/check_new_versions_job.rb`
+- `enterprise/app/services/internal/reconcile_plan_config_service.rb`
+- `app/controllers/super_admin/settings_controller.rb`
+- `app/controllers/dashboard_controller.rb`
+- `app/javascript/shared/store/globalConfig.js`
+- `app/javascript/dashboard/components-next/sidebar/SidebarChangelogCard.vue`
+
 ## CI/CD
 
 O workflow `.github/workflows/ctech_ci.yml` roda automaticamente em push e pull requests para `main-ctech`.
@@ -75,12 +108,7 @@ O SSO via **SAML** no Chatwoot é uma funcionalidade da **edição Enterprise**.
 ### Requisitos para habilitar SAML SSO
 
 1. **Edição Enterprise** — o diretório `enterprise/` deve estar presente (já incluso neste fork).
-2. **Plano de instalação** — `INSTALLATION_PRICING_PLAN` deve ser `enterprise` (não `community`).
-   - Super Admin → Settings, ou via Rails console:
-     ```ruby
-     InstallationConfig.find_or_create_by(name: 'INSTALLATION_PRICING_PLAN').update!(value: 'enterprise')
-     GlobalConfig.clear_cache
-     ```
+2. **Plano de instalação** — `INSTALLATION_PRICING_PLAN` = `enterprise` (padrão CTECH, sem sincronização com Hub).
 3. **Login SAML habilitado** — `ENABLE_SAML_SSO_LOGIN` = `true` (padrão).
 4. **Configuração por conta** — em **Settings → Security → SAML SSO**, configure:
    - SSO URL do IdP
@@ -92,7 +120,7 @@ O SSO via **SAML** no Chatwoot é uma funcionalidade da **edição Enterprise**.
 
 | Causa | Solução |
 |-------|---------|
-| `INSTALLATION_PRICING_PLAN` = `community` | Alterar para `enterprise` |
+| Feature `saml` desabilitada na conta | Habilitar em Super Admin → Accounts → Features |
 | `ENABLE_SAML_SSO_LOGIN` = `false` | Habilitar em Super Admin → App Configs |
 | Enterprise desabilitado (`DISABLE_ENTERPRISE=true`) | Remover a variável de ambiente |
 | SAML não configurado na conta | Configurar em Settings → Security |

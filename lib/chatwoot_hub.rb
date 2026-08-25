@@ -36,6 +36,15 @@ class ChatwootHub
     "#{billing_base_url}?installation_identifier=#{installation_identifier}"
   end
 
+  def self.disabled?
+    env_value = ENV.fetch('DISABLE_CHATWOOT_HUB', nil)
+    return true if ActiveModel::Type::Boolean.new.cast(env_value)
+
+    ActiveModel::Type::Boolean.new.cast(
+      InstallationConfig.find_by(name: 'DISABLE_CHATWOOT_HUB')&.value
+    )
+  end
+
   def self.pricing_plan
     return 'community' unless ChatwootApp.enterprise?
 
@@ -83,6 +92,8 @@ class ChatwootHub
   end
 
   def self.sync_with_hub
+    return if disabled?
+
     begin
       info = instance_config
       info = info.merge(instance_metrics) unless ENV['DISABLE_TELEMETRY']
@@ -97,6 +108,8 @@ class ChatwootHub
   end
 
   def self.register_instance(company_name, owner_name, owner_email)
+    return if disabled?
+
     info = { company_name: company_name, owner_name: owner_name, owner_email: owner_email, subscribed_to_mailers: true }
     RestClient.post(registration_url, info.merge(instance_config).to_json, { content_type: :json, accept: :json })
   rescue *ExceptionList::REST_CLIENT_EXCEPTIONS => e
@@ -114,11 +127,14 @@ class ChatwootHub
   end
 
   def self.send_push_with_response(fcm_options)
+    return if disabled?
+
     info = { fcm_options: fcm_options }
     RestClient.post(push_notification_url, info.merge(instance_config).to_json, { content_type: :json, accept: :json })
   end
 
   def self.emit_event(event_name, event_data)
+    return if disabled?
     return if ENV['DISABLE_TELEMETRY']
 
     info = { event_name: event_name, event_data: event_data }
