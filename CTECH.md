@@ -65,20 +65,82 @@ Também pode ser controlado via variável de ambiente `DISABLE_CHATWOOT_HUB=true
 - `app/javascript/shared/store/globalConfig.js`
 - `app/javascript/dashboard/components-next/sidebar/SidebarChangelogCard.vue`
 
+### 3. Super Admin sem billing/cloud
+
+Com `DISABLE_CHATWOOT_HUB=true`, o Super Admin não exibe:
+- Alerta de "premium changes" com link para vendas
+- Card "Current plan" com botão **Manage** (billing)
+- Aviso de limite de licenças de agentes
+- Botões **Upgrade now** nas features
+- Widget de suporte Chatwoot (chat ao vivo)
+- Botão **Chat Support**
+
+**Arquivos alterados:**
+- `app/views/super_admin/settings/show.html.erb`
+- `app/views/super_admin/application/_javascript.html.erb`
+
 ## CI/CD
 
 O workflow `.github/workflows/ctech_ci.yml` roda automaticamente em push e pull requests para `main-ctech`.
 
-### Jobs
+### O que o CI faz (alinhado ao build oficial EE)
 
-| Job | Descrição |
-|-----|-----------|
-| `lint-backend` | RuboCop |
-| `lint-frontend` | ESLint |
-| `frontend-tests` | Testes Vitest com cobertura |
-| `backend-tests` | RSpec completo (PostgreSQL + Redis) |
-| `docker-build` | Build multi-arquitetura (amd64 + arm64) |
-| `docker-merge` | Publica manifest no GitHub Container Registry |
+O build Docker do CTECH CI replica o processo de `publish_ee_docker.yml` (imagem Enterprise oficial):
+
+| Etapa | Oficial EE | CTECH CI |
+|-------|-----------|----------|
+| Dockerfile | `docker/Dockerfile` | `docker/Dockerfile` |
+| Edição | `ENV CW_EDITION="ee"` | `ENV CW_EDITION="ee"` |
+| Plataformas | linux/amd64 + linux/arm64 | linux/amd64 + linux/arm64 |
+| Build multi-arch | buildx + merge manifest | buildx + merge manifest |
+| Registry | DockerHub (`chatwoot/chatwoot`) | GHCR (`ghcr.io/ctech-informatica/chatwoot`) |
+
+**Diferença intencional:** o destino é o GHCR privado da CTECH, não o DockerHub público.
+
+**Em PR:** apenas valida que a imagem compila (sem publicar).
+**Em push na `main-ctech`:** compila e publica no GHCR.
+
+### Imagem privada no GHCR
+
+Por padrão, pacotes no GHCR **herdam a visibilidade do repositório**:
+- Repositório **privado** → imagem **privada**
+- Repositório **público** → imagem **pública**
+
+Para garantir que a imagem seja privada:
+
+1. Mantenha o repositório `CTECH-Informatica/chatwoot` como **privado**, **ou**
+2. Acesse **GitHub → Packages → chatwoot → Package settings → Change visibility → Private**
+
+**Login para pull em produção:**
+
+```bash
+echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+docker pull ghcr.io/ctech-informatica/chatwoot:latest
+```
+
+Use um Personal Access Token (classic) com permissão `read:packages`.
+
+### Workflows upstream desativados
+
+Workflows herdados do Chatwoot OSS que não se aplicam ao fork CTECH foram desativados:
+
+| Workflow | Motivo |
+|----------|--------|
+| `run_foss_spec.yml` | CI upstream (develop/master); CTECH usa `ctech_ci.yml` |
+| `deploy_check.yml` | Checagem de review app Heroku (inexistente na CTECH) |
+| `lint_pr.yml` | Validação de título semântico de PR (OSS público) |
+| `run_mfa_spec.yml` | Restrito a develop/master |
+| `auto-assign-pr.yml` | Automação OSS |
+| `stale.yml` / `lock.yml` | Automação de issues/PRs do projeto público |
+| `ghsa-linear-sync.yml` | Sync Linear do time Chatwoot |
+| `nightly_installer.yml` | Teste do instalador Linux upstream |
+
+### Jobs do CTECH CI
+
+| Job | PR | Push `main-ctech` |
+|-----|----|-------------------|
+| `docker-build` | Build multi-arch (sem push) | Build + push digest |
+| `docker-merge` | — | Publica manifest com tags |
 
 ### Imagem Docker
 

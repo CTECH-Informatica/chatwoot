@@ -25,6 +25,7 @@ window.chatwootSettings = {
   hideMessageBubble: true,
 };
 
+<% unless ChatwootHub.disabled? %>
 (function(d,t) {
   var BASE_URL = '';
   var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
@@ -46,5 +47,6 @@ window.addEventListener('chatwoot:ready', function() {
     name: '<%= SuperAdmin.first.name %>'
   });
 })
+<% end %>
 
 </script>
