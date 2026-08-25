@@ -23,7 +23,10 @@
       "SEND_MESSAGE": {
         "TITLE": "Hotkey to send messages",
         "NOTE": "You can select a hotkey (either Enter or Cmd/Ctrl+Enter) based on your preference of writing.",
+        "FORCED_NOTE": "Your organization requires Cmd/Ctrl + Enter to send messages.",
         "UPDATE_SUCCESS": "Your settings have been updated successfully",
+        "ENTER_KEY_DISABLED_LABEL": "Not allowed",
+        "ENTER_KEY_DISABLED_MESSAGE": "Not allowed by your administrator.",
         "CARD": {
           "ENTER_KEY": {
             "HEADING": "Enter (↵)",

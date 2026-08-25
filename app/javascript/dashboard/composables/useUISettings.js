@@ -120,9 +120,14 @@ const fetchQuotedReplyFlagFromUISettings = (channelType, uiSettings) => {
  * Checks if a specific editor hotkey is enabled.
  * @param {string} key - The key to check.
  * @param {Object} uiSettings - Reactive UI settings object.
+ * @param {boolean} forceCtrlEnterForMessages - Whether Enter is disabled by admin policy.
  * @returns {boolean} True if the hotkey is enabled, otherwise false.
  */
-const isEditorHotKeyEnabled = (key, uiSettings) => {
+const isEditorHotKeyEnabled = (key, uiSettings, forceCtrlEnterForMessages) => {
+  if (forceCtrlEnterForMessages) {
+    return key === 'cmd_enter';
+  }
+
   const {
     editor_message_key: editorMessageKey,
     enter_to_send_enabled: enterToSendEnabled,
@@ -141,6 +146,9 @@ export function useUISettings() {
   const getters = useStoreGetters();
   const store = useStore();
   const uiSettings = computed(() => getters.getUISettings.value);
+  const forceCtrlEnterForMessages = computed(
+    () => getters['globalConfig/get']?.value?.forceCtrlEnterForMessages ?? false
+  );
 
   const updateUISettings = (settings = {}) => {
     store.dispatch('updateUISettings', {
@@ -164,6 +172,7 @@ export function useUISettings() {
     uiSettings,
     updateUISettings,
     isOnExpandedLayout,
+    forceCtrlEnterForMessages,
     conversationSidebarItemsOrder: useConversationSidebarItemsOrder(uiSettings),
     contactSidebarItemsOrder: useContactSidebarItemsOrder(uiSettings),
     isContactSidebarItemOpen: key => !!uiSettings.value[key],
@@ -177,6 +186,7 @@ export function useUISettings() {
       setQuotedReplyFlagForInbox(channelType, value, updateUISettings),
     fetchQuotedReplyFlagFromUISettings: channelType =>
       fetchQuotedReplyFlagFromUISettings(channelType, uiSettings),
-    isEditorHotKeyEnabled: key => isEditorHotKeyEnabled(key, uiSettings),
+    isEditorHotKeyEnabled: key =>
+      isEditorHotKeyEnabled(key, uiSettings, forceCtrlEnterForMessages.value),
   };
 }
