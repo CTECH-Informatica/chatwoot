@@ -2,11 +2,14 @@ class SuperAdmin::SettingsController < SuperAdmin::ApplicationController
   def show; end
 
   def refresh
-    unless ChatwootHub.disabled?
-      Internal::CheckNewVersionsJob.perform_now
-    end
     # rubocop:disable Rails/I18nLocaleTexts
-    redirect_to super_admin_settings_path, notice: 'Instance status refreshed'
+    if ChatwootHub.disabled?
+      redirect_to super_admin_settings_path,
+                  notice: 'Chatwoot Hub is disabled for this installation. Instance sync was not performed.'
+    else
+      Internal::CheckNewVersionsJob.perform_now
+      redirect_to super_admin_settings_path, notice: 'Instance status refreshed'
+    end
     # rubocop:enable Rails/I18nLocaleTexts
   end
 end

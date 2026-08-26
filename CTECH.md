@@ -113,12 +113,13 @@ Para garantir que a imagem seja privada:
 
 **Login para pull em produção:**
 
+Crie um Personal Access Token (classic) com permissão `read:packages` e use-o no servidor:
+
 ```bash
-echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+export GHCR_PAT=seu_token_aqui
+echo "$GHCR_PAT" | docker login ghcr.io -u SEU_USUARIO_GITHUB --password-stdin
 docker pull ghcr.io/ctech-informatica/chatwoot:latest
 ```
-
-Use um Personal Access Token (classic) com permissão `read:packages`.
 
 ### Workflows upstream desativados
 
