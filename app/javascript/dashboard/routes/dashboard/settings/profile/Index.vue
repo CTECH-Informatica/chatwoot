@@ -47,7 +47,7 @@ export default {
     BaseSettingsHeader,
   },
   setup() {
-    const { isEditorHotKeyEnabled, updateUISettings, forceCtrlEnterForMessages } =
+    const { isEditorHotKeyEnabled, updateUISettings, forceCtrlEnterForMessages, uiSettings } =
       useUISettings();
     const { currentFontSize, updateFontSize } = useFontSize();
     const { replaceInstallationName } = useBranding();
@@ -58,6 +58,7 @@ export default {
       isEditorHotKeyEnabled,
       updateUISettings,
       forceCtrlEnterForMessages,
+      uiSettings,
       replaceInstallationName,
     };
   },
@@ -157,7 +158,17 @@ export default {
     }
 
     if (this.forceCtrlEnterForMessages) {
-      this.updateUISettings({ editor_message_key: 'cmd_enter' });
+      const {
+        editor_message_key: editorMessageKey,
+        enter_to_send_enabled: enterToSendEnabled,
+      } = this.uiSettings || {};
+      const usesEnterKey = editorMessageKey
+        ? editorMessageKey === 'enter'
+        : enterToSendEnabled === true;
+
+      if (usesEnterKey) {
+        this.updateUISettings({ editor_message_key: 'cmd_enter' });
+      }
     }
   },
   methods: {

@@ -1,5 +1,7 @@
 # TODO: lets use HTTParty instead of RestClient
 class ChatwootHub
+  class DisabledError < StandardError; end
+
   DEFAULT_BASE_URL = 'https://hub.2.chatwoot.com'.freeze
 
   def self.base_url
@@ -127,7 +129,7 @@ class ChatwootHub
   end
 
   def self.send_push_with_response(fcm_options)
-    return if disabled?
+    raise DisabledError, 'Chatwoot Hub is disabled for this installation' if disabled?
 
     info = { fcm_options: fcm_options }
     RestClient.post(push_notification_url, info.merge(instance_config).to_json, { content_type: :json, accept: :json })
