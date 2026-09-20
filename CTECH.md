@@ -1,12 +1,12 @@
 # CTECH — Chatwoot Customizado
 
-Este repositório contém o fork da CTECH baseado no Chatwoot **v4.17.0**. A branch padrão de desenvolvimento e produção é `main-ctech`.
+Este repositório contém o fork da CTECH baseado no Chatwoot **v4.18.0**. A branch padrão de desenvolvimento e produção é `main-ctech`.
 
 ## Branch base
 
 | Item | Valor |
 |------|-------|
-| Versão upstream | Chatwoot v4.17.0 |
+| Versão upstream | Chatwoot v4.18.0 |
 | Branch padrão | `main-ctech` |
 | Repositório | `CTECH-Informatica/chatwoot` |
 
@@ -18,7 +18,7 @@ Por política organizacional, os agentes **não podem** usar Enter para enviar m
 
 **Comportamento:**
 - A opção "Enter (↵)" nas configurações de perfil fica desabilitada.
-- Exibe o rótulo "Not allowed" e a mensagem "Not allowed by your administrator." na opção bloqueada.
+- Exibe o rótulo "Não permitido" e a mensagem "Não permitido pelo seu administrador." na opção bloqueada (pt_BR/pt).
 - O atalho ativo é forçado para `cmd_enter` automaticamente.
 - A descrição da seção informa que a organização exige Ctrl+Enter.
 
@@ -31,6 +31,8 @@ Por política organizacional, os agentes **não podem** usar Enter para enviar m
 - `app/javascript/dashboard/composables/useUISettings.js`
 - `app/javascript/dashboard/routes/dashboard/settings/profile/Index.vue`
 - `app/javascript/dashboard/i18n/locale/en/settings.json`
+- `app/javascript/dashboard/i18n/locale/pt_BR/settings.json`
+- `app/javascript/dashboard/i18n/locale/pt/settings.json`
 
 ### 2. Desativação do Chatwoot Hub (cloud)
 
@@ -140,8 +142,14 @@ Workflows herdados do Chatwoot OSS que não se aplicam ao fork CTECH foram desat
 
 | Job | PR | Push `main-ctech` |
 |-----|----|-------------------|
+| `lint-backend` | RuboCop | RuboCop |
+| `lint-frontend` | ESLint | ESLint |
+| `frontend-tests` | Vitest (coverage) | Vitest (coverage) |
+| `backend-tests` | RSpec (8 shards, com Enterprise) | RSpec (8 shards, com Enterprise) |
 | `docker-build` | Build multi-arch (sem push) | Build + push digest |
 | `docker-merge` | — | Publica manifest com tags |
+
+O build Docker só executa após todos os jobs de teste e lint passarem.
 
 ### Imagem Docker
 
