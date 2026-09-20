@@ -16,9 +16,14 @@ const getUISettingsMock = ref({
   channel_email_quoted_reply_enabled: true,
 });
 
+const globalConfigMock = ref({
+  forceCtrlEnterForMessages: false,
+});
+
 vi.mock('dashboard/composables/store', () => ({
   useStoreGetters: () => ({
     getUISettings: getUISettingsMock,
+    'globalConfig/get': globalConfigMock,
   }),
   useStore: () => ({
     dispatch: mockDispatch,
@@ -28,6 +33,14 @@ vi.mock('dashboard/composables/store', () => ({
 describe('useUISettings', () => {
   beforeEach(() => {
     mockDispatch.mockClear();
+    globalConfigMock.value = { forceCtrlEnterForMessages: false };
+    getUISettingsMock.value = {
+      is_ct_labels_open: true,
+      conversation_sidebar_items_order: DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER,
+      contact_sidebar_items_order: DEFAULT_CONTACT_SIDEBAR_ITEMS_ORDER,
+      editor_message_key: 'enter',
+      channel_email_quoted_reply_enabled: true,
+    };
   });
 
   it('returns uiSettings', () => {
@@ -146,6 +159,27 @@ describe('useUISettings', () => {
     const { isEditorHotKeyEnabled } = useUISettings();
     expect(isEditorHotKeyEnabled('enter')).toBe(false);
     expect(isEditorHotKeyEnabled('cmd_enter')).toBe(true);
+  });
+
+  describe('when forceCtrlEnterForMessages is enabled', () => {
+    beforeEach(() => {
+      globalConfigMock.value = { forceCtrlEnterForMessages: true };
+    });
+
+    it('forces cmd_enter as the only enabled hotkey', () => {
+      getUISettingsMock.value.editor_message_key = 'enter';
+      const { isEditorHotKeyEnabled } = useUISettings();
+      expect(isEditorHotKeyEnabled('cmd_enter')).toBe(true);
+      expect(isEditorHotKeyEnabled('enter')).toBe(false);
+    });
+
+    it('ignores legacy enter_to_send_enabled when editor_message_key is absent', () => {
+      getUISettingsMock.value.editor_message_key = undefined;
+      getUISettingsMock.value.enter_to_send_enabled = true;
+      const { isEditorHotKeyEnabled } = useUISettings();
+      expect(isEditorHotKeyEnabled('enter')).toBe(false);
+      expect(isEditorHotKeyEnabled('cmd_enter')).toBe(true);
+    });
   });
 
   it('handles non-existent keys', () => {
