@@ -8,6 +8,8 @@ on:
     branches:
       - main-ctech
   workflow_dispatch:
+    branches:
+      - main-ctech
 
 env:
   REGISTRY: ghcr.io
