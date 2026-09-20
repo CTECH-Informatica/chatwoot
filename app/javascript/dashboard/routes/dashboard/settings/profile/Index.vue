@@ -47,8 +47,12 @@ export default {
     BaseSettingsHeader,
   },
   setup() {
-    const { isEditorHotKeyEnabled, updateUISettings, forceCtrlEnterForMessages, uiSettings } =
-      useUISettings();
+    const {
+      isEditorHotKeyEnabled,
+      updateUISettings,
+      forceCtrlEnterForMessages,
+      uiSettings,
+    } = useUISettings();
     const { currentFontSize, updateFontSize } = useFontSize();
     const { replaceInstallationName } = useBranding();
 
@@ -134,7 +138,9 @@ export default {
           ...hotKey,
           disabled,
           disabledLabel: disabled
-            ? this.$t('PROFILE_SETTINGS.FORM.SEND_MESSAGE.ENTER_KEY_DISABLED_LABEL')
+            ? this.$t(
+                'PROFILE_SETTINGS.FORM.SEND_MESSAGE.ENTER_KEY_DISABLED_LABEL'
+              )
             : '',
           disabledMessage: disabled
             ? this.$t(

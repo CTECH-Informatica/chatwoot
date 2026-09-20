@@ -147,7 +147,8 @@ export function useUISettings() {
   const store = useStore();
   const uiSettings = computed(() => getters.getUISettings.value);
   const forceCtrlEnterForMessages = computed(
-    () => getters['globalConfig/get']?.value?.forceCtrlEnterForMessages ?? false
+    () =>
+      getters['globalConfig/get']?.value?.forceCtrlEnterForMessages ?? false
   );
 
   const updateUISettings = (settings = {}) => {
