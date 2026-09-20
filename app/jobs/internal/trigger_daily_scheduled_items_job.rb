@@ -11,7 +11,6 @@ class Internal::TriggerDailyScheduledItemsJob < ApplicationJob
 
   def schedule_version_check
     return unless Rails.env.production?
-    return if ChatwootHub.disabled?
 
     Internal::CheckNewVersionsJob.set(wait_until: version_check_run_at).perform_later
   end

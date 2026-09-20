@@ -52,8 +52,6 @@ class Notification::PushTestService
   def test_fcm(subscription)
     if firebase_credentials_present?
       test_fcm_direct(subscription)
-    elsif ChatwootHub.disabled?
-      result(subscription, 'fcm_via_hub', :skipped, 'Chatwoot Hub is disabled for this installation')
     elsif chatwoot_hub_enabled?
       test_fcm_via_hub(subscription)
     else
@@ -77,8 +75,6 @@ class Notification::PushTestService
   def test_fcm_via_hub(subscription)
     response = ChatwootHub.send_push_with_response(fcm_options(subscription))
     result(subscription, 'fcm_via_hub', :success, "HTTP #{response.code} — #{response.body}")
-  rescue ChatwootHub::DisabledError => e
-    result(subscription, 'fcm_via_hub', :skipped, e.message)
   rescue RestClient::ExceptionWithResponse => e
     result(subscription, 'fcm_via_hub', :failure, "HTTP #{e.response&.code} — #{e.response&.body}")
   rescue StandardError => e

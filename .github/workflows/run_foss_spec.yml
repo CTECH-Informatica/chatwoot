@@ -7,9 +7,6 @@ on:
       - develop
       - master
   pull_request:
-    branches:
-      - develop
-      - master
   workflow_dispatch:
 
 jobs:

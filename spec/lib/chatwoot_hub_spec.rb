@@ -14,60 +14,6 @@ describe ChatwootHub do
     expect(described_class.installation_identifier).to eq installation_identifier
   end
 
-  describe '.disabled?' do
-    it 'returns true when DISABLE_CHATWOOT_HUB env is set' do
-      with_modified_env DISABLE_CHATWOOT_HUB: 'true' do
-        expect(described_class.disabled?).to be true
-      end
-    end
-
-    it 'returns true when installation config disables the hub' do
-      with_modified_env DISABLE_CHATWOOT_HUB: nil do
-        InstallationConfig.find_or_create_by(name: 'DISABLE_CHATWOOT_HUB').update!(value: true)
-        expect(described_class.disabled?).to be true
-      end
-    end
-
-    it 'returns false when hub is not disabled' do
-      with_modified_env DISABLE_CHATWOOT_HUB: nil do
-        InstallationConfig.where(name: 'DISABLE_CHATWOOT_HUB').delete_all
-        expect(described_class.disabled?).to be false
-      end
-    end
-  end
-
-  context 'when hub is disabled via environment' do
-    around do |example|
-      with_modified_env DISABLE_CHATWOOT_HUB: 'true' do
-        example.run
-      end
-    end
-
-    it 'does not sync with hub' do
-      allow(RestClient).to receive(:post)
-      expect(described_class.sync_with_hub).to be_nil
-      expect(RestClient).not_to have_received(:post)
-    end
-
-    it 'does not register instance' do
-      allow(RestClient).to receive(:post)
-      described_class.register_instance('test', 'owner', 'owner@test.com')
-      expect(RestClient).not_to have_received(:post)
-    end
-
-    it 'does not emit events' do
-      allow(RestClient).to receive(:post)
-      described_class.emit_event('sample_event', { sample: 'data' })
-      expect(RestClient).not_to have_received(:post)
-    end
-
-    it 'raises DisabledError on send_push_with_response' do
-      expect do
-        described_class.send_push_with_response({ token: 'test' })
-      end.to raise_error(ChatwootHub::DisabledError)
-    end
-  end
-
   context 'when fetching sync_with_hub' do
     it 'get latest version from chatwoot hub' do
       version = '1.1.1'

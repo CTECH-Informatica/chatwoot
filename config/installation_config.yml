@@ -328,7 +328,7 @@
 
 # ------- Chatwoot Internal Config for Self Hosted ----#
 - name: INSTALLATION_PRICING_PLAN
-  value: 'enterprise'
+  value: 'community'
   description: 'The pricing plan for the installation, retrieved from the billing API'
 - name: INSTALLATION_PRICING_PLAN_QUANTITY
   value: 0
@@ -376,11 +376,6 @@
 ## ------ End of Configs added for enterprise clients ------ ##
 
 ## ------ Configs added for CTECH fork ------ ##
-- name: DISABLE_CHATWOOT_HUB
-  value: true
-  type: boolean
-  locked: true
-  description: 'Disable all outbound requests to Chatwoot Hub (billing sync, telemetry, version checks, push relay)'
 - name: FORCE_CTRL_ENTER_FOR_MESSAGES
   value: true
   type: boolean
