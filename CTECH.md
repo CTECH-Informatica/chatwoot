@@ -42,7 +42,7 @@ O workflow `.github/workflows/ctech_ci.yml` publica a imagem Docker da CTECH no 
 |-------|-----------|
 | Strip enterprise | Remove `enterprise/` e `spec/enterprise/` |
 | Edição | `ENV CW_EDITION="ce"` |
-| Plataformas | linux/amd64 + linux/arm64 |
+| Plataforma | linux/amd64 |
 | Registry | `ghcr.io/ctech-informatica/chatwoot` |
 
 **Em PR:** valida que a imagem compila (sem publicar).
