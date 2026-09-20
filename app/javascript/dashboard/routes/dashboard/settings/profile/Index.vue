@@ -47,7 +47,12 @@ export default {
     BaseSettingsHeader,
   },
   setup() {
-    const { isEditorHotKeyEnabled, updateUISettings } = useUISettings();
+    const {
+      isEditorHotKeyEnabled,
+      updateUISettings,
+      forceCtrlEnterForMessages,
+      uiSettings,
+    } = useUISettings();
     const { currentFontSize, updateFontSize } = useFontSize();
     const { replaceInstallationName } = useBranding();
 
@@ -56,6 +61,8 @@ export default {
       updateFontSize,
       isEditorHotKeyEnabled,
       updateUISettings,
+      forceCtrlEnterForMessages,
+      uiSettings,
       replaceInstallationName,
     };
   },
@@ -122,10 +129,52 @@ export default {
     isMfaEnabled() {
       return parseBoolean(window.chatwootConfig?.isMfaEnabled);
     },
+    sendMessageHotKeyOptions() {
+      return this.hotKeys.map(hotKey => {
+        const isEnterKey = hotKey.key === 'enter';
+        const disabled = isEnterKey && this.forceCtrlEnterForMessages;
+
+        return {
+          ...hotKey,
+          disabled,
+          disabledLabel: disabled
+            ? this.$t(
+                'PROFILE_SETTINGS.FORM.SEND_MESSAGE.ENTER_KEY_DISABLED_LABEL'
+              )
+            : '',
+          disabledMessage: disabled
+            ? this.$t(
+                'PROFILE_SETTINGS.FORM.SEND_MESSAGE.ENTER_KEY_DISABLED_MESSAGE'
+              )
+            : '',
+        };
+      });
+    },
+    sendMessageSectionDescription() {
+      if (this.forceCtrlEnterForMessages) {
+        return this.$t('PROFILE_SETTINGS.FORM.SEND_MESSAGE.FORCED_NOTE');
+      }
+
+      return this.$t('PROFILE_SETTINGS.FORM.SEND_MESSAGE.NOTE');
+    },
   },
   mounted() {
     if (this.currentUserId) {
       this.initializeUser();
+    }
+
+    if (this.forceCtrlEnterForMessages) {
+      const {
+        editor_message_key: editorMessageKey,
+        enter_to_send_enabled: enterToSendEnabled,
+      } = this.uiSettings || {};
+      const usesEnterKey = editorMessageKey
+        ? editorMessageKey === 'enter'
+        : enterToSendEnabled === true;
+
+      if (usesEnterKey) {
+        this.updateUISettings({ editor_message_key: 'cmd_enter' });
+      }
     }
   },
   methods: {
@@ -201,6 +250,10 @@ export default {
       }
     },
     toggleHotKey(key) {
+      if (key === 'enter' && this.forceCtrlEnterForMessages) {
+        return;
+      }
+
       this.hotKeys = this.hotKeys.map(hotKey =>
         hotKey.key === key ? { ...hotKey, active: !hotKey.active } : hotKey
       );
@@ -286,17 +339,20 @@ export default {
     <SectionLayout
       with-border
       :title="$t('PROFILE_SETTINGS.FORM.SEND_MESSAGE.TITLE')"
-      :description="$t('PROFILE_SETTINGS.FORM.SEND_MESSAGE.NOTE')"
+      :description="sendMessageSectionDescription"
     >
       <div
         class="flex flex-col justify-between w-full gap-5 sm:gap-4 sm:flex-row"
       >
         <RadioCard
-          v-for="hotKey in hotKeys"
+          v-for="hotKey in sendMessageHotKeyOptions"
           :id="hotKey.key"
           :key="hotKey.key"
           :label="hotKey.title"
           :description="hotKey.description"
+          :disabled="hotKey.disabled"
+          :disabled-label="hotKey.disabledLabel"
+          :disabled-message="hotKey.disabledMessage"
           :is-active="isEditorHotKeyEnabled(hotKey.key)"
           class="sm:flex-1"
           @select="toggleHotKey"

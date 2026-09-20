@@ -23,7 +23,10 @@
       "SEND_MESSAGE": {
         "TITLE": "Tecla de atalho para enviar mensagens",
         "NOTE": "Você pode selecionar uma tecla de atalho (Enter ou Cmd/Ctrl+Enter) com base na sua preferência de escrita.",
+        "FORCED_NOTE": "Sua organização exige Cmd/Ctrl + Enter para enviar mensagens.",
         "UPDATE_SUCCESS": "Suas configurações foram atualizadas com sucesso",
+        "ENTER_KEY_DISABLED_LABEL": "Não permitido",
+        "ENTER_KEY_DISABLED_MESSAGE": "Não permitido pelo seu administrador.",
         "CARD": {
           "ENTER_KEY": {
             "HEADING": "Enter (↵)",

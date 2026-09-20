@@ -375,6 +375,14 @@
   description: 'Disable rendering profile update page for users'
 ## ------ End of Configs added for enterprise clients ------ ##
 
+## ------ Configs added for CTECH fork ------ ##
+- name: FORCE_CTRL_ENTER_FOR_MESSAGES
+  value: true
+  type: boolean
+  locked: true
+  description: 'Force Ctrl+Enter as the only message send hotkey and disable the Enter option in profile settings'
+## ------ End of Configs added for CTECH fork ------ ##
+
 ## ------ Configs added for FCM v1 notifications ------ ##
 - name: FIREBASE_PROJECT_ID
   display_title: 'Firebase Project ID'
