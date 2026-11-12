@@ -1,12 +1,12 @@
 # CTECH — Chatwoot Customizado
 
-Este repositório contém o fork da CTECH baseado no Chatwoot **v4.18.0**. A branch padrão de desenvolvimento e produção é `main-ctech`.
+Este repositório contém o fork da CTECH baseado no Chatwoot **v4.19.1**. A branch padrão de desenvolvimento e produção é `main-ctech`.
 
 ## Branch base
 
 | Item | Valor |
 |------|-------|
-| Versão upstream | Chatwoot v4.18.0 |
+| Versão upstream | Chatwoot v4.19.1 |
 | Branch padrão | `main-ctech` |
 | Repositório | `CTECH-Informatica/chatwoot` |
 

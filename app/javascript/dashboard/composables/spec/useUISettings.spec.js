@@ -13,7 +13,6 @@ const getUISettingsMock = ref({
   conversation_sidebar_items_order: DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER,
   contact_sidebar_items_order: DEFAULT_CONTACT_SIDEBAR_ITEMS_ORDER,
   editor_message_key: 'enter',
-  channel_email_quoted_reply_enabled: true,
 });
 
 const globalConfigMock = ref({
@@ -40,7 +39,6 @@ describe('useUISettings', () => {
         DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER,
       contact_sidebar_items_order: DEFAULT_CONTACT_SIDEBAR_ITEMS_ORDER,
       editor_message_key: 'enter',
-      channel_email_quoted_reply_enabled: true,
     };
   });
 
@@ -52,7 +50,6 @@ describe('useUISettings', () => {
         DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER,
       contact_sidebar_items_order: DEFAULT_CONTACT_SIDEBAR_ITEMS_ORDER,
       editor_message_key: 'enter',
-      channel_email_quoted_reply_enabled: true,
     });
   });
 
@@ -67,7 +64,6 @@ describe('useUISettings', () => {
           DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER,
         contact_sidebar_items_order: DEFAULT_CONTACT_SIDEBAR_ITEMS_ORDER,
         editor_message_key: 'enter',
-        channel_email_quoted_reply_enabled: true,
       },
     });
   });
@@ -82,7 +78,6 @@ describe('useUISettings', () => {
           DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER,
         contact_sidebar_items_order: DEFAULT_CONTACT_SIDEBAR_ITEMS_ORDER,
         editor_message_key: 'enter',
-        channel_email_quoted_reply_enabled: true,
       },
     });
   });
@@ -118,7 +113,6 @@ describe('useUISettings', () => {
         contact_sidebar_items_order: DEFAULT_CONTACT_SIDEBAR_ITEMS_ORDER,
         email_signature_enabled: true,
         editor_message_key: 'enter',
-        channel_email_quoted_reply_enabled: true,
       },
     });
   });
@@ -126,26 +120,6 @@ describe('useUISettings', () => {
   it('fetches signature flag from UI settings correctly', () => {
     const { fetchSignatureFlagFromUISettings } = useUISettings();
     expect(fetchSignatureFlagFromUISettings('email')).toBe(undefined);
-  });
-
-  it('sets quoted reply flag for inbox correctly', () => {
-    const { setQuotedReplyFlagForInbox } = useUISettings();
-    setQuotedReplyFlagForInbox('Channel::Email', false);
-    expect(mockDispatch).toHaveBeenCalledWith('updateUISettings', {
-      uiSettings: {
-        is_ct_labels_open: true,
-        conversation_sidebar_items_order:
-          DEFAULT_CONVERSATION_SIDEBAR_ITEMS_ORDER,
-        contact_sidebar_items_order: DEFAULT_CONTACT_SIDEBAR_ITEMS_ORDER,
-        editor_message_key: 'enter',
-        channel_email_quoted_reply_enabled: false,
-      },
-    });
-  });
-
-  it('fetches quoted reply flag from UI settings correctly', () => {
-    const { fetchQuotedReplyFlagFromUISettings } = useUISettings();
-    expect(fetchQuotedReplyFlagFromUISettings('Channel::Email')).toBe(true);
   });
 
   it('returns correct value for isEditorHotKeyEnabled when editor_message_key is configured', () => {
